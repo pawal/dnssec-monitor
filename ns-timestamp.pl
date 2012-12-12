@@ -30,6 +30,7 @@ use Net::DNS;
 use Date::Format;
 use Pod::Usage;
 use Getopt::Long;
+use Data::Dumper;
 
 my $debug    = 0;
 my %hostname = ();
@@ -77,6 +78,9 @@ sub nameservers {
             printf STDERR ("%s IN NS %s.\n", $qname, $rr->nsdname) if $debug;
             push @res, addresses($rr->nsdname);
         }
+    } else {
+        printf STDERR ("No nameservers found for %s\n", $qname) if $debug;
+        exit(-1);
     }
 
     return @res;
@@ -126,7 +130,10 @@ sub timestamp {
 
         my $response = $resolver->send($query);
 
-        next unless $response;
+        unless ($response) {
+            printf STDERR ("No response from %s\n", $ns) if $debug;
+            next;
+        }
 
         foreach my $rr ($response->additional) {
             if ($rr->type eq "TSIG") {
