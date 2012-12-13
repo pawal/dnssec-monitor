@@ -127,6 +127,7 @@ sub timestamp {
         # create SOA query for domain and sign with dummy TSIG
         my $query = Net::DNS::Packet->new($domain, "SOA", "IN");
         $query->sign_tsig("name", "secret");
+	@{[$query->additional]}[0]->algorithm; # temporary fix for Net::DNS
         my $now = time();
 
         my $response = $resolver->send($query);
