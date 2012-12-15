@@ -30,6 +30,7 @@ use Net::DNS;
 use Date::Format;
 use Pod::Usage;
 use Getopt::Long;
+use Data::Dumper;
 
 my $debug    = 0;
 my %hostname = ();
@@ -77,6 +78,9 @@ sub nameservers {
             printf STDERR ("%s IN NS %s.\n", $qname, $rr->nsdname) if $debug;
             push @res, addresses($rr->nsdname);
         }
+    } else {
+        printf STDERR ("No nameservers found for %s\n", $qname) if $debug;
+        exit(-1);
     }
 
     return @res;
@@ -115,20 +119,26 @@ sub timestamp {
 
     my $resolver = Net::DNS::Resolver->new;
 
+  NAMESERVER:
     foreach my $ns (@nsaddr) {
         $resolver->nameservers($ns);
         $resolver->recurse(0);
 
-        # send SOA query for domain and sign query with TSIG
+        # create SOA query for domain and sign with dummy TSIG
         my $query = Net::DNS::Packet->new($domain, "SOA", "IN");
         $query->sign_tsig("name", "secret");
+	@{[$query->additional]}[0]->algorithm; # temporary fix for Net::DNS
         my $now = time();
 
         my $response = $resolver->send($query);
 
-        next unless $response;
+        unless ($response) {
+            printf STDERR ("No response from %s\n", $ns) if $debug;
+            next;
+        }
 
         foreach my $rr ($response->additional) {
+
             if ($rr->type eq "TSIG") {
                 my $diff = $rr->time_signed - $now;
 
@@ -152,9 +162,12 @@ sub timestamp {
                             sprintf("%s (%s)", $hostname{$ns}, $ns), $diff);
 
                     }
+                    next NAMESERVER;
                 }
             }
         }
+
+        printf STDERR ("No TSIG reply from %s\n", $ns) if $debug;
     }
 }
 
