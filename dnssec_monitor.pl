@@ -59,6 +59,7 @@ sub main {
     my $zsk_expire_critical = 1;
     my $zsk_expire_warning  = 3;
     my $enable_wildcard     = 0;
+    my $enable_nsec3        = 0;
 
     GetOptions(
         'help|?'        => \$help,
@@ -68,7 +69,8 @@ sub main {
         'kskwarning=i'  => \$ksk_expire_warning,
         'zskcritical=i' => \$zsk_expire_critical,
         'zskwarning=i'  => \$zsk_expire_warning,
-	'wildcard'      => \$enable_wildcard,
+        'wildcard'      => \$enable_wildcard,
+        'nsec3'         => \$enable_nsec3,
         'debug+'        => \$debug,
         'quiet|q'       => \$quiet
     ) or pod2usage(2);
@@ -112,7 +114,14 @@ sub main {
         $errors++ unless ($c->report($c->check_apex_rrsig()));
         $errors++ unless ($c->report($c->check_exist($zone, "SOA")));
         $errors++ unless ($c->report($c->check_exist($zone, "NS")));
-	$errors++ unless ($c->report($c->check_nxdomain($nonexisting, "NS",$enable_wildcard)));
+        $errors++
+          unless (
+            $c->report(
+                $c->check_nxdomain(
+                    $nonexisting, "NS", $enable_wildcard, $enable_nsec3
+                )
+            )
+          );
     }
 
     exit($errors);
@@ -175,6 +184,7 @@ Options:
  --zskcritical N  check for ZSK expire within DAYS days
  --zskwarning  N  check for ZSK expire within DAYS days
  --wildcard       disable the nxdomain check to allow for wildcards
+ --nsec3          require NSEC3
  --debug          turn on debugging
  --quiet          be really quiet
  --version        display version and exit
