@@ -51,6 +51,8 @@ sub main {
     my $zsk_expire_critical = 1;
     my $zsk_expire_warning  = 3;
     my $dstport             = 53;
+    my $enable_wildcard     = 0;
+    my $enable_nsec3        = 0;
 
     GetOptions(
 	'help|?'     => \$help,
@@ -61,6 +63,8 @@ sub main {
         'zskwarning=i'  => \$zsk_expire_warning,
         'debug+'        => \$debug,
         'dstport=i'     => \$dstport,
+        'wildcard'      => \$enable_wildcard,
+        'nsec3'         => \$enable_nsec3,
     ) or die;
 
     pod2usage(2) if ($help);
@@ -98,7 +102,7 @@ sub main {
         nagios($c->{error});
     }
 
-    unless ($c->check_nxdomain($nonexisting, "NS")) {
+    unless ($c->check_nxdomain($nonexisting, "NS", $enable_wildcard, $enable_nsec3)) {
         nagios($c->{error});
     }
 
