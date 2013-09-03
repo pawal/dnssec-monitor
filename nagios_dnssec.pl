@@ -124,7 +124,7 @@ sub nagios {
 
     if (/^UNKNOWN: (.*)/) {
         print "DNSSEC UNKNOWN: $1\n";
-        exit(0);
+        exit(3);
     }
 
     if (/^OK: (.*)/) {
