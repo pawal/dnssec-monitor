@@ -405,14 +405,19 @@ sub check_exist {
 }
 
 sub check_nxdomain {
-    my $self  = shift;
-    my $qname = shift;
-    my $qtype = shift;
+    my $self            = shift;
+    my $qname           = shift;
+    my $qtype           = shift;
     my $enable_wildcard = shift || 0;
+    my $enable_nsec3    = shift || 0;
 
-    my @sig       = ();
-    my @authority = ();
     my $zone;
+
+    my $authority_by_name  = undef;
+    my $signatures_by_name = undef;
+
+    my $negatives  = 0;
+    my $signatures = 0;
 
     $self->_init();
 
@@ -427,10 +432,10 @@ sub check_nxdomain {
     }
 
     if (not $enable_wildcard) {
-	if ($packet->header->rcode ne "NXDOMAIN") {
-	    $self->{error} = "$qname/IN/$qtype should not exist";
-	    return 0;
-	}
+        if ($packet->header->rcode ne "NXDOMAIN") {
+            $self->{error} = "$qname/IN/$qtype should not exist";
+            return 0;
+        }
     }
 
     # fetch SOA from authority section
@@ -446,40 +451,53 @@ sub check_nxdomain {
     }
 
     foreach my $rr ($packet->authority) {
-        next unless ($rr->name eq $zone);
 
-        if ($rr->type eq "NSEC") {
-            push @authority, $rr;
+        if ($rr->type eq "NSEC" and not $enable_nsec3) {
+            push @{ $authority_by_name->{ $rr->name } }, $rr;
+            $negatives++;
+            next;
+        }
+
+        if ($rr->type eq "NSEC3" and $enable_nsec3) {
+            push @{ $authority_by_name->{ $rr->name } }, $rr;
+            $negatives++;
             next;
         }
 
         if ($rr->type eq "RRSIG") {
-            push @sig, $rr;
+            push @{ $signatures_by_name->{ $rr->name } }, $rr;
+            $signatures++;
             next;
         }
     }
 
-    unless (scalar @authority > 0) {
-        $self->{error} = "no NSEC found in authority section";
+    unless ($negatives > 0) {
+        $self->{error} = "no NSEC/NSEC3 found in authority section";
         return 0;
     }
 
-    unless (scalar @sig > 0) {
-        $self->{error} = "no NSEC RRSIG found";
+    unless ($signatures > 0) {
+        $self->{error} = "no NSEC/NSEC3 RRSIG found";
         return 0;
     }
 
     # verify signatures using available ZSK
-    my $verified_zsk =
-      verify_answer(\@authority, \@sig, \@{ $self->{zsk} }, $self->{debug});
+    foreach my $owner (keys %{$authority_by_name}) {
+        my $a = $authority_by_name->{$owner};
+        my $s = $signatures_by_name->{$owner};
 
-    if ($verified_zsk) {
-        $self->{message} = "$qname/IN/$qtype verified (NXDOMAIN)";
-        return 1;
-    } else {
-        $self->{error} = "$qname/IN/$qtype failed verification (NXDOMAIN)";
-        return 0;
+        my $verified_zsk =
+          verify_answer($a, $s, \@{ $self->{zsk} }, $self->{debug});
+
+        unless ($verified_zsk) {
+            $self->{error} = "$qname/IN/$qtype failed verification (NXDOMAIN)";
+            return 0;
+        }
+
     }
+
+    $self->{message} = "$qname/IN/$qtype verified (NXDOMAIN)";
+    return 1;
 }
 
 sub verify_answer {
