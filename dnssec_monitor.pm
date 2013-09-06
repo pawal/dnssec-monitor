@@ -465,8 +465,12 @@ sub check_nxdomain {
         }
 
         if ($rr->type eq "RRSIG") {
-            push @{ $signatures_by_name->{ $rr->name } }, $rr;
-            $signatures++;
+            if (   ($rr->typecovered eq "NSEC" and not $enable_nsec3)
+                or ($rr->typecovered eq "NSEC3" and $enable_nsec3))
+            {
+                push @{ $signatures_by_name->{ $rr->name } }, $rr;
+                $signatures++;
+            }
             next;
         }
     }
