@@ -152,7 +152,7 @@ sub timestamp {
                     $diff_s = "+$diff" if ($diff > 0);
 
                     if ($do_absolute) {
-                        my $ts = time2str("%Y:%m:%d %H:%M:%S", $rr->time_signed,
+                        my $ts = time2str("%Y-%m-%d %H:%M:%S", $rr->time_signed,
                             "UTC");
                         printf("%-50s  %s %s\n",
                             sprintf("%s (%s)", $hostname{$ns}, $ns),
