@@ -560,7 +560,7 @@ sub keyinfo {
 sub rrsig2time {
     my $rrsig = shift;
 
-    my $i = $rrsig->siginceptation;
+    my $i = $rrsig->siginception;
     my $e = $rrsig->sigexpiration;
 
     $i =~ s/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/$1:$2:$3 $4:$5:$6/;
