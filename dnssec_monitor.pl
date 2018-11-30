@@ -195,5 +195,5 @@ Options:
 =head1 ABSTRACT
 
 dnssec-monitor will check integrity of the zone DNSKEYs, SOA and NS.
-It will also generate a random domain name and verify that a NSEC
-record is generated for negative answers. NSEC3 is not supported.
+It will also generate a random domain name and verify that a NSEC or
+NSEC3 record is generated for negative answers.
