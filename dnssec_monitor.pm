@@ -572,7 +572,15 @@ sub rrsig2time {
 sub algorithm2string {
     my $algorithm = shift;
 
-    return "RSASHA1" if ($algorithm == 5);
+    return "RSASHA1"              if ($algorithm == 5);
+    return "RSASHA1-NSEC3-SHA1"   if ($algorithm == 7);
+    return "RSASHA256"            if ($algorithm == 8);
+    return "RSASHA512"            if ($algorithm == 10);
+    return "ECC-GOST"             if ($algorithm == 12);
+    return "ECDSAP256SHA256"      if ($algorithm == 13);
+    return "ECDSAP384SHA384"      if ($algorithm == 14);
+    return "ED25519"              if ($algorithm == 15);
+    return "ED448"                if ($algorithm == 16);
 
     return $algorithm;
 }
