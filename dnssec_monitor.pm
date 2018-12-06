@@ -318,7 +318,7 @@ sub _check_expire () {
 
                 if ($days < 0) {
                     $self->{error} =
-                      sprintf("CRITICAL: %s RRSIG %s %s has expired",
+                      sprintf("CRITICAL: %s RRSIG %s %s has expired before %.1f days",
                         $s->signame, $s->typecovered, keyinfo($k), $days);
                     return 0;
                 }
