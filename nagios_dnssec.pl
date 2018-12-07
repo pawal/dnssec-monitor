@@ -55,20 +55,20 @@ sub main {
     my $enable_nsec3        = 0;
 
     GetOptions(
-	'help|?'     => \$help,
-        'zone=s'        => \$zone,
-        'kskcritical=i' => \$ksk_expire_critical,
-        'kskwarning=i'  => \$ksk_expire_warning,
-        'zskcritical=i' => \$zsk_expire_critical,
-        'zskwarning=i'  => \$zsk_expire_warning,
-        'debug+'        => \$debug,
-        'dstport=i'     => \$dstport,
-        'wildcard'      => \$enable_wildcard,
-        'nsec3'         => \$enable_nsec3,
+	'help|?'        => \$help,
+	'zone=s'        => \$zone,
+	'kskcritical=i' => \$ksk_expire_critical,
+	'kskwarning=i'  => \$ksk_expire_warning,
+	'zskcritical=i' => \$zsk_expire_critical,
+	'zskwarning=i'  => \$zsk_expire_warning,
+	'debug+'        => \$debug,
+	'dstport=i'     => \$dstport,
+	'wildcard'      => \$enable_wildcard,
+	'nsec3'         => \$enable_nsec3,
     ) or die;
 
     pod2usage(2) if ($help);
-    die "no zone"       unless ($zone);
+    die "no zonename"   unless ($zone);
     die "no nameserver" unless ($#ARGV == 0);
 
     my %args = (
@@ -150,11 +150,11 @@ nagios_dnssec.pl - Nagios DNSSEC Plugin
 
 nagios_dssec.pl --zone zonename nameserver
 
-        --zone zone         The zone to test (required argument)
-        --kskcritical=i     KSK critical (days)
-        --kskwarning=i      KSK warning (days)
-        --zskcritical=i     ZSK critical (days)
-        --zskwarning=i      ZSK warning (days)
+        --zone zonename     The zone to test (required argument)
+        --kskcritical=i     KSK critical (days) (7 is default)
+        --kskwarning=i      KSK warning  (days) (14 is default)
+        --zskcritical=i     ZSK critical (days) (1 is default)
+        --zskwarning=i      ZSK warning  (days) (3 is default)
         --debug             Debug mode
         --dstport=i         Destination port on name server (53 is default)
 
