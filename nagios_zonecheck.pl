@@ -31,6 +31,7 @@ use warnings;
 use strict;
 
 use Getopt::Long;
+use Pod::Usage;
 
 use Net::DNS 0.49;
 use Net::DNS::SEC 0.12;
