@@ -158,6 +158,8 @@ nagios_dnssec.pl --zone zonename nameserver
         --zskwarning=i      ZSK warning  (days) (3 is default)
         --debug             Debug mode
         --dstport=i         Destination port on name server (53 is default)
+        --wildcard          Disable the NXDOMAIN check to allow for wildcards
+        --nsec3             Require NSEC3
 
 =head1 AUTHOR
 
