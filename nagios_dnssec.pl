@@ -149,7 +149,7 @@ nagios_dnssec.pl - Nagios DNSSEC Plugin
 
 =head1 SYNOPSIS
 
-nagios_dssec.pl --zone zonename nameserver
+nagios_dnssec.pl --zone zonename nameserver
 
         --zone zonename     The zone to test (required argument)
         --kskcritical=i     KSK critical (days) (7 is default)
