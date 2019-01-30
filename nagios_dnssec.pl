@@ -37,6 +37,7 @@ use Digest::BubbleBabble qw(bubblebabble);
 use Pod::Usage;
 use Getopt::Long;
 
+use lib '.';
 use dnssec_monitor;
 
 ######################################################################

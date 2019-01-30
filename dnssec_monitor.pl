@@ -40,6 +40,7 @@ use Crypt::OpenSSL::Random qw(random_bytes);
 use Digest::SHA1 qw(sha1);
 use Digest::BubbleBabble qw(bubblebabble);
 
+use lib '.';
 use dnssec_monitor;
 
 use constant PROGNAME => "dnssec_monitor";
