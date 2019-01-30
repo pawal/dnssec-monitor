@@ -31,7 +31,7 @@ use warnings;
 use strict;
 
 use Crypt::OpenSSL::Random qw(random_bytes);
-use Digest::SHA1 qw(sha1);
+use Digest::SHA qw(sha1);
 use Digest::BubbleBabble qw(bubblebabble);
 
 use Pod::Usage;
