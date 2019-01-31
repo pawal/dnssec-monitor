@@ -31,12 +31,13 @@ use warnings;
 use strict;
 
 use Crypt::OpenSSL::Random qw(random_bytes);
-use Digest::SHA1 qw(sha1);
+use Digest::SHA qw(sha1);
 use Digest::BubbleBabble qw(bubblebabble);
 
 use Pod::Usage;
 use Getopt::Long;
 
+use lib '.';
 use dnssec_monitor;
 
 ######################################################################
@@ -148,7 +149,7 @@ nagios_dnssec.pl - Nagios DNSSEC Plugin
 
 =head1 SYNOPSIS
 
-nagios_dssec.pl --zone zonename nameserver
+nagios_dnssec.pl --zone zonename nameserver
 
         --zone zonename     The zone to test (required argument)
         --kskcritical=i     KSK critical (days) (7 is default)
@@ -157,6 +158,8 @@ nagios_dssec.pl --zone zonename nameserver
         --zskwarning=i      ZSK warning  (days) (3 is default)
         --debug             Debug mode
         --dstport=i         Destination port on name server (53 is default)
+        --wildcard          Disable the NXDOMAIN check to allow for wildcards
+        --nsec3             Require NSEC3
 
 =head1 AUTHOR
 
