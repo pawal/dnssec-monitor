@@ -61,26 +61,30 @@ sub main {
     $res->recurse(0);
     $res->tcp_timeout($timeout);
     $res->nameservers($server);
-    $res->axfr_start($zone);
 
-    if ($res->axfr_next) {
+    my $i = $res->axfr($zone);
+    if (! defined $i) {
+        my $error = $res->errorstring;
+
+        if ($error =~ /NOTAUTH/) {
+            printf("WARNING: server not authoritative for $zone\n");
+            exit(1);
+        }
+
+        if ($error =~ /REFUSED/) {
+            printf("OK: zone transfer refused\n");
+            exit(0);
+        }
+
+        printf("WARNING: %s\n", $res->errorstring);
+        return 1;
+    }
+
+    if ($i->()) {
         printf("CRITICAL: zone transfer possible\n");
         exit(2);
     }
 
-    my $error = $res->errorstring;
-
-    if ($error =~ /.*: NOTAUTH/) {
-        printf("WARNING: server not authoritative for $zone\n");
-        exit(1);
-    }
-
-    if ($error =~ /.*: REFUSED/) {
-        printf("OK: zone transfer refused\n");
-        exit(0);
-    }
-
-    printf("WARNING: no answer from server\n");
     exit(1);
 }
 
