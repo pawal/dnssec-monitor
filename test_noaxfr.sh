@@ -26,7 +26,19 @@
 #
 ######################################################################
 
-ZONE=${1:-se.}
+# Find utils needed
+if ! [ -x "$(command -v dig)" ]; then
+  echo 'Error: dig is not installed.' >&2
+  exit 1
+fi
+
+ZONE="$1"
+
+# Check domain argument
+if [ ! -n "${ZONE}" ]; then
+    echo "No domain name given"
+    exit 1
+fi
 
 for ns in `dig $ZONE ns +short`; do
     for addr in `dig $ns a +short`; do
