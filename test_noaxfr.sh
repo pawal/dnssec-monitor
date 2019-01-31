@@ -31,6 +31,6 @@ ZONE=${1:-se.}
 for ns in `dig $ZONE ns +short`; do
     for addr in `dig $ns a +short`; do
 	echo $ZONE $ns $addr
-	perl nagios_noaxfr.pl --zone=$ZONE --server=$addr
+	perl nagios_noaxfr.pl --zone $ZONE --server $addr
     done
 done
